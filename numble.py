@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox
 import random
+import json
+import os
 
 
 class NumbleGame:
@@ -37,10 +39,8 @@ class NumbleGame:
             'best_score': float('inf')
         }
         
-        # Load stats if available
-        self.load_stats()
-        
         self.setup_ui()
+        self.load_stats()
         self.reset_game()
     
     def setup_ui(self):
@@ -194,7 +194,7 @@ class NumbleGame:
         
         # Input frame
         input_frame = tk.Frame(self.root, bg="#c6f6d5")
-        input_frame.pack(pady=20)
+        input_frame.pack(pady=10)
         
         self.entry = tk.Entry(
             input_frame,
@@ -240,7 +240,7 @@ class NumbleGame:
             bg="#c6f6d5",
             fg="#22543d"
         )
-        history_label.pack(pady=(20, 5))
+        history_label.pack(pady=(10, 5))
         
         # Scrollable history
         history_container = tk.Frame(self.root, bg="#c6f6d5")
@@ -255,7 +255,7 @@ class NumbleGame:
             bg="#2f855a",
             fg="white",
             state=tk.DISABLED,
-            height=8,
+            height=6,
             yscrollcommand=scrollbar.set
         )
         self.history_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -270,7 +270,7 @@ class NumbleGame:
             bg="#2f855a",
             fg="white",
             cursor="hand2"
-        ).pack(pady=10)
+        ).pack(pady=5)
     
     def generate_target_number(self):
         if self.allow_repeating_digits:
@@ -578,6 +578,7 @@ class NumbleGame:
         self.stats['best_streak'] = max(self.stats['current_streak'], self.stats['best_streak'])
         self.stats['total_guesses'] += guess_count
         self.stats['best_score'] = min(self.stats['best_score'], guess_count)
+        self.save_stats()
     
     def show_stats(self):
         stats_window = tk.Toplevel(self.root)
@@ -660,11 +661,11 @@ class NumbleGame:
         repeat_text = "with" if not self.allow_repeating_digits else "allowing"
         
         if self.difficulty_mode == "easy":
-            mode_text = "• Position of each symbol is shown directly"
+            mode_text = "• 🔒 = correct digit in correct position\n• 🔓 = correct digit in wrong position\n• Position of symbols is available"
         elif self.difficulty_mode == "hard":
-            mode_text = "• Only shows count of correct positions (no symbols)"
+            mode_text = "• Only shows count of correct digits in correct positions (no symbols)"
         else:
-            mode_text = "• 🔒 = correct digit in correct position\n• 🔓 = correct digit in wrong position"
+            mode_text = "• 🔒 = correct digit in correct position\n• 🔓 = correct digit in wrong position\n• Position of symbols is not available"
         
         instructions = f"""How to play:
 • Guess the {self.digit_count}-digit number {repeat_text} repeating digits
@@ -676,6 +677,24 @@ class NumbleGame:
     def toggle_symbol_positions(self):
         self.show_symbol_positions = self.show_positions_var.get()
         self.update_history_display()
+    
+    def load_stats(self):
+        """Load stats from file if it exists"""
+        try:
+            if os.path.exists('numble_stats.json'):
+                with open('numble_stats.json', 'r') as f:
+                    saved_stats = json.load(f)
+                    self.stats.update(saved_stats)
+        except Exception as e:
+            print(f"Could not load stats: {e}")
+    
+    def save_stats(self):
+        """Save stats to file"""
+        try:
+            with open('numble_stats.json', 'w') as f:
+                json.dump(self.stats, f)
+        except Exception as e:
+            print(f"Could not save stats: {e}")
 
 
 if __name__ == "__main__":
