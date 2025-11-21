@@ -1,2 +1,8 @@
 # games
-Simple and fun code toys
+Simple code toys
+
+### Contents
+- Numble
+Wordle but with numbers
+- Duckhunt
+Tkinter remake of the classic NES game
