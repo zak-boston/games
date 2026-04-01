@@ -1,4 +1,4 @@
-# games
+# toys
 Simple code toys
 
 ### Contents
@@ -6,3 +6,5 @@ Simple code toys
 Wordle but with numbers
 - Duckhunt
 Tkinter remake of the classic NES game
+- Typing trainer
+Typing trainer with wholesome text
